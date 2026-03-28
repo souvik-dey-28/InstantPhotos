@@ -30,45 +30,9 @@
       background: #1f2937; border: 1px solid #374151; border-radius: 1rem;
       padding: 1.5rem; max-width: 520px; width: 95%; max-height: 90vh; overflow: auto;
     }
-    /* Layout toggle pills */
-    .layout-pill {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 8px 18px; border-radius: 999px; cursor: pointer;
-      border: 2px solid #374151; background: transparent;
-      color: #9ca3af; font-size: 0.875rem; font-weight: 600;
-      transition: all 0.2s;
-    }
-    .layout-pill.active {
-      border-color: #3b82f6; background: rgba(59,130,246,0.15); color: #60a5fa;
-    }
-    .layout-pill:hover:not(.active) { border-color: #4b5563; color: #d1d5db; }
-    /* Color swatches */
-    .color-swatch {
-      width: 36px; height: 36px; border-radius: 50%; cursor: pointer;
-      border: 3px solid transparent; transition: all 0.2s;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
-    }
-    .color-swatch:hover { transform: scale(1.12); }
-    .color-swatch.active { border-color: #ffffff; transform: scale(1.15); }
-    .color-swatch.swatch-blank {
-      background: #374151;
-      background-image: repeating-conic-gradient(#4b5563 0% 25%, #374151 0% 50%);
-      background-size: 12px 12px;
-    }
-    /* Per-photo orientation mini pills */
-    .mini-pill {
-      font-size: 0.7rem; font-weight: 600; padding: 3px 10px; border-radius: 999px;
-      border: 1.5px solid #374151; background: transparent; color: #9ca3af; cursor: pointer;
-      transition: all 0.15s;
-    }
-    .mini-pill.active {
-      border-color: #3b82f6; background: rgba(59,130,246,0.2); color: #60a5fa;
-    }
-    .mini-pill:hover:not(.active) { border-color: #4b5563; color: #d1d5db; }
   </style>
 </head>
 <body class="bg-gray-900 text-white" oncontextmenu="return false">
-
 
   <div id="particles-js"></div>
 
@@ -93,7 +57,7 @@
     <div class="relative bg-gray-800/60 backdrop-blur-md border border-gray-700 rounded-2xl shadow-2xl p-8 max-w-3xl mx-auto">
 
       <h2 class="text-2xl font-bold text-center mb-2">Upload Photos</h2>
-      <p class="text-gray-400 text-center text-sm mb-6">Add one or more photos. Set copies, orientation, and layout per photo.</p>
+      <p class="text-gray-400 text-center text-sm mb-6">Add one or more photos. Set how many copies of each you need.</p>
 
       <!-- Drop Zone -->
       <div id="dropZone" class="border-2 border-dashed border-gray-600 hover:border-blue-400 bg-gray-900/50 rounded-xl p-8 cursor-pointer transition-all text-center">
@@ -102,22 +66,13 @@
           <svg class="w-14 h-14 text-gray-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-4-4V7a4 4 0 014-4h10a4 4 0 014 4v5a4 4 0 01-4 4h-2m-6 4h6m-3-4v4"/>
           </svg>
-          <p class="text-lg font-semibold">Drag &amp; Drop or Click to Upload</p>
+          <p class="text-lg font-semibold">Drag & Drop or Click to Upload</p>
           <p class="text-sm text-gray-400 mt-1">Multiple photos supported • JPG, PNG, WEBP</p>
         </div>
       </div>
 
-      <!-- Select-All Orientation Bar (shown when photos exist) -->
-      <div id="selectAllBar" class="hidden mt-4 flex items-center justify-between bg-gray-900/50 border border-gray-700 rounded-xl px-5 py-3">
-        <span class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Set All Photos:</span>
-        <div class="flex gap-2">
-          <button id="selectAllV" class="mini-pill" title="Set all photos to Portrait">⬜ All Portrait</button>
-          <button id="selectAllH" class="mini-pill" title="Set all photos to Landscape">⬛ All Landscape</button>
-        </div>
-      </div>
-
       <!-- Photo Cards List -->
-      <div id="photoList" class="mt-4 space-y-3"></div>
+      <div id="photoList" class="mt-6 space-y-3"></div>
 
       <!-- Add More Button (shown after first upload) -->
       <div id="addMoreWrapper" class="hidden mt-3 text-center">
@@ -126,109 +81,28 @@
         </button>
       </div>
 
-      <!-- Info Banner -->
-      <div class="mt-8 bg-blue-900/30 border border-blue-500/50 rounded-lg p-4 text-center">
-        <p class="text-sm text-blue-200 font-medium">✨ Welcome to Passport Photo Pro! ✨</p>
-        <p class="text-xs text-blue-300 mt-2">
-          Portrait mode fits <span class="font-bold text-white">42 photos</span> on A4 perfectly.<br/>
-          Landscape mode fits <span class="font-bold text-white">40 photos</span> on A4 perfectly.<br/>
-          <em>Tip: Always use the Crop button before generating for the best results!</em><br/>
-          Thank you for using Passport Photo Pro!
-        </p>
-      </div>
-
-      <!-- Background Color -->
-      <div class="mt-6">
-        <p class="text-sm font-semibold text-gray-300 mb-3 text-center tracking-wide uppercase">🎨 Photo Background Color</p>
-        <div class="flex justify-center gap-3 flex-wrap">
-          <div class="flex flex-col items-center gap-1">
-            <button id="bg-white" class="color-swatch active" style="background:#ffffff;" title="White"></button>
-            <span class="text-xs text-gray-400">White</span>
-          </div>
-          <div class="flex flex-col items-center gap-1">
-            <button id="bg-blank" class="color-swatch swatch-blank" title="Blank / Transparent"></button>
-            <span class="text-xs text-gray-400">Blank</span>
-          </div>
-          <div class="flex flex-col items-center gap-1">
-            <button id="bg-red" class="color-swatch" style="background:#dc3232;" title="Red"></button>
-            <span class="text-xs text-gray-400">Red</span>
-          </div>
-          <div class="flex flex-col items-center gap-1">
-            <button id="bg-blue" class="color-swatch" style="background:#005ab4;" title="Blue"></button>
-            <span class="text-xs text-gray-400">Blue</span>
-          </div>
-          <div class="flex flex-col items-center gap-1">
-            <button id="bg-yellow" class="color-swatch" style="background:#ffd500;" title="Yellow"></button>
-            <span class="text-xs text-gray-400">Yellow</span>
-          </div>
-          <div class="flex flex-col items-center gap-1">
-            <button id="bg-green" class="color-swatch" style="background:#228b3b;" title="Green"></button>
-            <span class="text-xs text-gray-400">Green</span>
-          </div>
-          <div class="flex flex-col items-center gap-1">
-            <button id="bg-orange" class="color-swatch" style="background:#ff8c00;" title="Orange"></button>
-            <span class="text-xs text-gray-400">Orange</span>
-          </div>
-          <div class="flex flex-col items-center gap-1">
-            <button id="bg-pink" class="color-swatch" style="background:#ff69b4;" title="Pink"></button>
-            <span class="text-xs text-gray-400">Pink</span>
-          </div>
-          <div class="flex flex-col items-center gap-1">
-            <button id="bg-darkviolet" class="color-swatch" style="background:#9400d3;" title="Dark Violet"></button>
-            <span class="text-xs text-gray-400">Dark Violet</span>
-          </div>
-        </div>
-      </div>
-
       <!-- Advanced Options -->
       <div class="mt-8 space-y-4">
         <div class="text-center">
-          <button id="toggleAdvanced" class="text-blue-400 hover:text-blue-300 transition-all text-sm font-semibold">⚙️ Advanced Options ▼</button>
+          <button id="toggleAdvanced" class="text-blue-400 hover:text-blue-300 transition-all text-sm">Advanced Options</button>
         </div>
         <div id="advancedOptions" class="hidden bg-gray-900/50 p-6 rounded-lg border border-gray-700">
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left">
             <div>
-              <label class="block mb-1 text-sm font-medium">📏 Width (px)</label>
+              <label class="block mb-1 text-sm font-medium">Width (px)</label>
               <input type="number" id="width" value="390" class="w-full bg-gray-700 border border-gray-600 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
             </div>
             <div>
-              <label class="block mb-1 text-sm font-medium">📐 Height (px)</label>
+              <label class="block mb-1 text-sm font-medium">Height (px)</label>
               <input type="number" id="height" value="480" class="w-full bg-gray-700 border border-gray-600 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
             </div>
             <div>
-              <label class="block mb-1 text-sm font-medium">↔ Spacing (px)</label>
+              <label class="block mb-1 text-sm font-medium">Spacing (px)</label>
               <input type="number" id="spacing" value="10" class="w-full bg-gray-700 border border-gray-600 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
             </div>
             <div>
-              <label class="block mb-1 text-sm font-medium">🔲 Border (px)</label>
+              <label class="block mb-1 text-sm font-medium">Border (px)</label>
               <input type="number" id="border" value="2" class="w-full bg-gray-700 border border-gray-600 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
-            </div>
-            <div>
-              <label class="block mb-1 text-sm font-medium">🖼️ Photos per Page <span class="text-gray-500 font-normal">(0 = auto)</span></label>
-              <input type="number" id="photosPerPage" value="0" min="0" max="100" class="w-full bg-gray-700 border border-gray-600 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
-              <p class="text-xs text-gray-500 mt-1">Max photos to print on one page. 0 = fill automatically.</p>
-            </div>
-            <div>
-              <label class="block mb-1 text-sm font-medium">🖨️ DPI (Resolution)</label>
-              <select id="dpi" class="w-full bg-gray-700 border border-gray-600 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <option value="150">150 DPI — Draft / Preview</option>
-                <option value="300" selected>300 DPI — Standard Print ✅</option>
-                <option value="600">600 DPI — High Quality</option>
-              </select>
-            </div>
-            <div class="sm:col-span-2">
-              <label class="block mb-1 text-sm font-medium">📄 Paper Size</label>
-              <div class="flex gap-3 flex-wrap">
-                <label class="flex items-center gap-2 cursor-pointer text-sm">
-                  <input type="radio" name="paper_size" value="a4" checked class="accent-blue-500"/> A4 (210×297mm)
-                </label>
-                <label class="flex items-center gap-2 cursor-pointer text-sm">
-                  <input type="radio" name="paper_size" value="letter" class="accent-blue-500"/> Letter (8.5×11in)
-                </label>
-                <label class="flex items-center gap-2 cursor-pointer text-sm">
-                  <input type="radio" name="paper_size" value="4x6" class="accent-blue-500"/> 4×6 Photo Print
-                </label>
-              </div>
             </div>
           </div>
         </div>
@@ -242,7 +116,7 @@
             Download PDF
           </button>
         </div>
-        <div id="loading" class="hidden text-blue-400 font-semibold text-center">⏳ Processing images... please wait</div>
+        <div id="loading" class="hidden text-blue-400 font-semibold text-center">Processing images... please wait</div>
       </div>
 
       <!-- PDF Preview -->
@@ -259,7 +133,7 @@
       </div>
       <div class="flex gap-3 mt-4 justify-end">
         <button id="cancelCropBtn" class="bg-gray-600 hover:bg-gray-500 text-white py-2 px-5 rounded-lg transition-all">Cancel</button>
-        <button id="confirmCropBtn" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-5 rounded-lg transition-all">Crop &amp; Save</button>
+        <button id="confirmCropBtn" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-5 rounded-lg transition-all">Crop & Save</button>
       </div>
     </div>
   </div>
@@ -291,8 +165,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
   <script>
-    alert("Welcome to Passport Photo Pro!\n\nHere default mode 42 photo A4 page easily print, landscape mode 40 photo A4 page easily print. Before generating, use crop for better photo result!\n\nThank you for using Passport Photo Pro!");
-
     emailjs.init("XJqjmVHK4ISEX0Zam");
 
     particlesJS('particles-js', {
@@ -312,50 +184,36 @@
     });
 
     // ---- State ----
-    // photos: Array of { id, originalFile, croppedFile, previewUrl, copies, orientation }
+    // photos: Array of { id, originalFile, croppedFile, previewUrl, copies }
     let photos = [];
     let nextId = 0;
-    let selectedBgColor = 'white';
-
-    // ---- Background Color Swatches ----
-    const bgColors = ['white','blank','red','blue','yellow','green','orange','pink','darkviolet'];
-    bgColors.forEach(color => {
-      const btn = document.getElementById('bg-' + color);
-      if (!btn) return;
-      btn.addEventListener('click', () => {
-        bgColors.forEach(c => document.getElementById('bg-' + c)?.classList.remove('active'));
-        btn.classList.add('active');
-        selectedBgColor = color;
-      });
-    });
 
     // Cropper modal state
     let activeCropper = null;
     let pendingCropId = null;
 
     // DOM refs
-    const dropZone       = document.getElementById('dropZone');
-    const imageInput     = document.getElementById('imageInput');
-    const photoList      = document.getElementById('photoList');
-    const selectAllBar   = document.getElementById('selectAllBar');
+    const dropZone = document.getElementById('dropZone');
+    const imageInput = document.getElementById('imageInput');
+    const photoList = document.getElementById('photoList');
     const addMoreWrapper = document.getElementById('addMoreWrapper');
-    const addMoreBtn     = document.getElementById('addMoreBtn');
-    const generateBtn    = document.getElementById('generateBtn');
-    const downloadBtn    = document.getElementById('downloadBtn');
-    const pdfPreview     = document.getElementById('pdfPreview');
-    const loading        = document.getElementById('loading');
+    const addMoreBtn = document.getElementById('addMoreBtn');
+    const generateBtn = document.getElementById('generateBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const pdfPreview = document.getElementById('pdfPreview');
+    const loading = document.getElementById('loading');
     const toggleAdvanced = document.getElementById('toggleAdvanced');
     const advancedOptions = document.getElementById('advancedOptions');
-    const cropperModal   = document.getElementById('cropperModal');
+    const cropperModal = document.getElementById('cropperModal');
     const cropModalImage = document.getElementById('cropModalImage');
     const confirmCropBtn = document.getElementById('confirmCropBtn');
-    const cancelCropBtn  = document.getElementById('cancelCropBtn');
-    const notification   = document.getElementById('notification');
-    const notifMsg       = document.getElementById('notification-message');
-    const feedbackBtn    = document.getElementById('feedbackBtn');
-    const feedbackModal  = document.getElementById('feedbackModal');
-    const closeModal     = document.getElementById('closeModal');
-    const feedbackForm   = document.getElementById('feedbackForm');
+    const cancelCropBtn = document.getElementById('cancelCropBtn');
+    const notification = document.getElementById('notification');
+    const notifMsg = document.getElementById('notification-message');
+    const feedbackBtn = document.getElementById('feedbackBtn');
+    const feedbackModal = document.getElementById('feedbackModal');
+    const closeModal = document.getElementById('closeModal');
+    const feedbackForm = document.getElementById('feedbackForm');
 
     // ---- Notifications ----
     function showNotification(msg, isError = true) {
@@ -375,28 +233,20 @@
       photoList.innerHTML = '';
       photos.forEach(photo => {
         const card = document.createElement('div');
-        card.className = 'photo-card flex items-start gap-4 bg-gray-900/60 border border-gray-700 rounded-xl p-4';
+        card.className = 'photo-card flex items-center gap-4 bg-gray-900/60 border border-gray-700 rounded-xl p-4';
         card.innerHTML = `
           <img src="${photo.previewUrl}" class="w-16 h-20 object-cover rounded-lg border border-gray-600 flex-shrink-0" />
           <div class="flex-1 min-w-0">
             <p class="text-sm font-medium text-gray-200 truncate">${photo.originalFile.name}</p>
             <p class="text-xs text-gray-500 mt-0.5">${photo.croppedFile ? '✅ Cropped' : '⚠️ Not cropped'}</p>
-            <!-- Per-photo orientation -->
-            <div class="flex items-center gap-2 mt-2">
-              <span class="text-xs text-gray-500">Orientation:</span>
-              <button class="mini-pill photo-orient-btn ${photo.orientation === 'vertical' ? 'active' : ''}"
-                data-id="${photo.id}" data-orient="vertical">Portrait</button>
-              <button class="mini-pill photo-orient-btn ${photo.orientation === 'horizontal' ? 'active' : ''}"
-                data-id="${photo.id}" data-orient="horizontal">Landscape</button>
-            </div>
           </div>
-          <div class="flex flex-col items-center gap-1 flex-shrink-0">
+          <div class="flex flex-col items-center gap-1">
             <label class="text-xs text-gray-400">Copies</label>
             <input type="number" value="${photo.copies}" min="1" max="54"
               class="bg-gray-700 border border-gray-600 rounded-lg w-16 p-1.5 text-center text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               data-id="${photo.id}" />
           </div>
-          <div class="flex flex-col gap-2 flex-shrink-0">
+          <div class="flex flex-col gap-2">
             <button class="crop-btn text-xs bg-blue-500/20 hover:bg-blue-500/40 text-blue-300 border border-blue-500/30 px-3 py-1.5 rounded-lg transition-all" data-id="${photo.id}">Crop</button>
             <button class="remove-btn text-xs bg-red-500/20 hover:bg-red-500/40 text-red-400 border border-red-500/30 px-3 py-1.5 rounded-lg transition-all" data-id="${photo.id}">Remove</button>
           </div>
@@ -410,20 +260,6 @@
           const id = parseInt(e.target.dataset.id);
           const photo = photos.find(p => p.id === id);
           if (photo) photo.copies = Math.max(1, parseInt(e.target.value) || 1);
-        });
-      });
-
-      // Bind per-photo orientation buttons
-      photoList.querySelectorAll('.photo-orient-btn').forEach(btn => {
-        btn.addEventListener('click', e => {
-          const id = parseInt(e.target.dataset.id);
-          const orient = e.target.dataset.orient;
-          const photo = photos.find(p => p.id === id);
-          if (!photo) return;
-          photo.orientation = orient;
-          // Update active state within the same card's three buttons
-          const cardBtns = photoList.querySelectorAll(`.photo-orient-btn[data-id="${id}"]`);
-          cardBtns.forEach(b => b.classList.toggle('active', b.dataset.orient === orient));
         });
       });
 
@@ -441,26 +277,12 @@
           const id = parseInt(e.target.dataset.id);
           photos = photos.filter(p => p.id !== id);
           renderPhotoList();
-          if (photos.length === 0) {
-            addMoreWrapper.classList.add('hidden');
-            selectAllBar.classList.add('hidden');
-          }
+          if (photos.length === 0) addMoreWrapper.classList.add('hidden');
         });
       });
 
       addMoreWrapper.classList.toggle('hidden', photos.length === 0);
-      selectAllBar.classList.toggle('hidden', photos.length === 0);
     }
-
-    // ---- Select All Orientation ----
-    document.getElementById('selectAllH').addEventListener('click', () => {
-      photos.forEach(p => p.orientation = 'horizontal');
-      renderPhotoList();
-    });
-    document.getElementById('selectAllV').addEventListener('click', () => {
-      photos.forEach(p => p.orientation = 'vertical');
-      renderPhotoList();
-    });
 
     // ---- Add Files ----
     function addFiles(files) {
@@ -473,8 +295,7 @@
           originalFile: file,
           croppedFile: null,
           previewUrl: URL.createObjectURL(file),
-          copies: 6,
-          orientation: 'vertical'   // Default to Portrait
+          copies: 6
         };
         photos.push(photo);
         added++;
@@ -543,11 +364,10 @@
     });
 
     // ---- Advanced Options ----
-    let advancedOpen = false;
     toggleAdvanced.addEventListener('click', () => {
-      advancedOpen = !advancedOpen;
-      advancedOptions.classList.toggle('hidden', !advancedOpen);
-      toggleAdvanced.textContent = advancedOpen ? '⚙️ Advanced Options ▲' : '⚙️ Advanced Options ▼';
+      const visible = advancedOptions.style.display === 'block';
+      advancedOptions.style.display = visible ? 'none' : 'block';
+      toggleAdvanced.textContent = visible ? 'Advanced Options' : 'Hide Advanced Options';
     });
 
     // ---- Generate PDF ----
@@ -557,23 +377,16 @@
         return;
       }
 
-      const photosPerPageVal = document.getElementById('photosPerPage').value;
-      const dpiVal = document.getElementById('dpi').value;
-      const paperSizeVal = document.querySelector('input[name="paper_size"]:checked')?.value || 'a4';
-
       const formData = new FormData();
       photos.forEach((photo, i) => {
+        // Use cropped file if available, else original
         formData.append(`image_${i}`, photo.croppedFile || photo.originalFile);
         formData.append(`copies_${i}`, photo.copies);
-        formData.append(`orientation_${i}`, photo.orientation);
       });
-      formData.append('width',          document.getElementById('width').value);
-      formData.append('height',         document.getElementById('height').value);
-      formData.append('spacing',        document.getElementById('spacing').value);
-      formData.append('border',         document.getElementById('border').value);
-      formData.append('photos_per_page', photosPerPageVal);
-      formData.append('dpi',            dpiVal);
-      formData.append('bg_color',       selectedBgColor);
+      formData.append('width', document.getElementById('width').value);
+      formData.append('height', document.getElementById('height').value);
+      formData.append('spacing', document.getElementById('spacing').value);
+      formData.append('border', document.getElementById('border').value);
 
       loading.classList.remove('hidden');
       generateBtn.disabled = true;
@@ -582,18 +395,9 @@
 
       fetch('/process', { method: 'POST', body: formData })
         .then(async response => {
-          if (response.status === 503) {
-            let data = {}; try { data = await response.json(); } catch(e) {}
-            const missing = (data.error || '').replace('missing_api_keys:', '');
-            showNotification("⚠️ API keys missing! Add them to your .env file: " + missing); return null;
-          }
-          if (response.status === 401) { showNotification("❌ Invalid API key. Check your .env file (REMOVE_BG_API_KEY or Cloudinary keys)."); return null; }
-          if (response.status === 429) { showNotification("⏳ Daily quota exceeded. Wait 24h or upgrade your remove.bg plan."); return null; }
-          if (response.status === 410) { showNotification("🔍 Could not detect a face/background in one of the images. Try a clearer photo."); return null; }
-          if (response.status === 500) {
-            let data = {}; try { data = await response.json(); } catch(e) {}
-            showNotification("❌ Server error: " + (data.error || "unknown error. Check your API keys.")); return null;
-          }
+          if (response.status === 429) { showNotification("Server Daily Quota Exceeded. Please try again later."); return null; }
+          if (response.status === 410) { showNotification("Cannot Detect Face/Background in one of the images."); return null; }
+          if (response.status === 500) { showNotification("Internal Error, try again later."); return null; }
           if (!response.ok) throw new Error("Processing failed.");
           return response.blob();
         })
