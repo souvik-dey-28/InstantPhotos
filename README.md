@@ -9,11 +9,11 @@ A web-based tool to generate print-ready passport photo sheets from uploaded ima
 - **Multi-photo upload** — drag & drop or click to upload one or more photos at once
 - **Per-photo copy count** — set how many copies of each photo you need (1–54)
 - **In-browser cropper** — crop each photo to the correct passport aspect ratio before processing
-- **AI background removal** — powered by [remove.bg](https://www.remove.bg/)
-- **AI image enhancement** — restored and sharpened via [Cloudinary's gen_restore](https://cloudinary.com/documentation/image_transformations)
+- **100% Free Local AI background removal** — powered by the open-source `rembg` library, no API keys required!
+- **Local image enhancement** — automatically sharpens and enhances photos directly on your machine
 - **A4 print layout** — photos are automatically arranged in a grid at 300 DPI
 - **Multi-page PDF** — if photos exceed one A4 page, additional pages are created automatically
-- **Advanced options** — customize photo width, height, spacing, and border size
+- **Secure File Handling (Blue Team verified)** — strong built-in limits for file sizes and payload protections
 - **Feedback system** — built-in bug report form powered by EmailJS
 - **Animated particle background** — via Particles.js
 
@@ -26,9 +26,9 @@ A web-based tool to generate print-ready passport photo sheets from uploaded ima
 | Frontend  | HTML, Tailwind CSS, Vanilla JS    |
 | Cropping  | Cropper.js                        |
 | Backend   | Python, Flask                     |
-| Image AI  | remove.bg API, Cloudinary AI      |
+| Image AI  | `rembg` (Background removal)      |
 | PDF gen   | Pillow (PIL)                      |
-| Email     | EmailJS                           |
+| Security  | Flask limits, Werkzeug secure I/O |
 
 ---
 
@@ -36,92 +36,71 @@ A web-based tool to generate print-ready passport photo sheets from uploaded ima
 
 - Python 3.8+
 - pip
-- A [remove.bg](https://www.remove.bg/api) API key
-- A [Cloudinary](https://cloudinary.com/) account (free tier works)
+- An internet connection for the *first run only* (to download the background removal AI model)
 
 ---
 
-## 🛠️ Installation
+## 🛠️ Step-by-Step Instructions
 
-### 1. Clone the repository
+### ▶️ First Time Setup & Running
+
+**1. Clone the repository**
 
 ```bash
-git clone https://github.com/deepakguptabca/InstantPhotos.git
-cd passport-photo-pro
+git clone https://github.com/souvik-dey-28/InstantPhotos.git
+cd InstantPhotos
 ```
 
-### 2. Create a virtual environment (recommended)
+**2. Create and connect to a virtual environment**
 
 ```bash
 python -m venv venv
 
-# On macOS/Linux
-source venv/bin/activate
-
 # On Windows
 venv\Scripts\activate
+
+# On macOS/Linux
+source venv/bin/activate
 ```
 
-### 3. Install dependencies
+**3. Install all required dependencies**
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Set up environment variables
-
-Create a `.env` file in the project root:
-
-```env
-REMOVE_BG_API_KEY=your_remove_bg_api_key_here
-CLOUDINARY_CLOUD_NAME=your_cloud_name
-CLOUDINARY_API_KEY=your_cloudinary_api_key
-CLOUDINARY_API_SECRET=your_cloudinary_api_secret
-```
-
-> ⚠️ Never commit your `.env` file. Add it to `.gitignore`.
-
-### 5. Run the app
+**4. Start the Application**
 
 ```bash
 python app.py
 ```
+*Note: The first time you process an image, `rembg` will automatically download the AI model needed to remove backgrounds (around ~170MB). This may take a few moments depending on your network. Future uses will be instant and completely offline.*
 
 The server will start at `http://localhost:5000`.
 
 ---
 
-## 📁 Project Structure
+### 🛑 How to Stop the Program
 
-```
-passport-photo-pro/
-├── app.py                  # Flask backend — image processing & PDF generation
-├── requirements.txt        # Python dependencies
-├── .env                    # Environment variables (not committed)
-├── templates/
-│   └── index.html          # Frontend UI
-└── README.md
-```
+When you are finished using the application, go back to the terminal (Command Prompt/PowerShell) where the server is running and press:
+`Ctrl + C`
+This will terminate the Flask server gracefully.
 
 ---
 
-## 📋 requirements.txt
+### 🔄 How to Run on Subsequent Times
 
-Make sure your `requirements.txt` includes:
+To run the program again in the future, you do not need to reinstall anything. Follow these simple steps:
 
-```
-flask
-pillow
-requests
-python-dotenv
-cloudinary
-```
-
-Generate it automatically with:
-
-```bash
-pip freeze > requirements.txt
-```
+1. Open your terminal in the `InstantPhotos` folder.
+2. Activate your virtual environment: 
+   ```bash
+   venv\Scripts\activate
+   ```
+3. Run the application: 
+   ```bash
+   python app.py
+   ```
 
 ---
 
@@ -130,76 +109,31 @@ pip freeze > requirements.txt
 ### Upload
 - Open the app in your browser at `http://localhost:5000`
 - Drag and drop one or more photos onto the upload zone, or click to browse
-- Each photo appears as a card with a thumbnail
 
 ### Crop (Optional but Recommended)
-- Click **Crop** on any photo card
 - A modal cropper opens with a fixed passport aspect ratio (384×472)
 - Adjust the crop area and click **Crop & Save**
 
-### Set Copies
-- Each photo card has a **Copies** input (default: 6)
-- Change it per photo to control how many times it appears on the sheet
-
-### Advanced Options (Optional)
-- Click **Advanced Options** to customize:
-  - **Width / Height** — passport photo dimensions in pixels
-  - **Spacing** — gap between rows of photos
-  - **Border** — black border thickness around each photo
-
 ### Generate
-- Click **Generate Sheet**
-- The backend processes each photo:
-  1. Removes the background via remove.bg
-  2. Uploads to Cloudinary and applies AI restoration
-  3. Resizes and adds a border
+- The backend processes each photo locally:
+  1. Validates the image securely.
+  2. Removes the background via `rembg`.
+  3. Enhances and sharpens via `PIL.ImageEnhance`.
+  4. Resizes and adds a border.
 - All photos are arranged on A4 pages (2480×3508 px at 300 DPI)
 - If photos overflow one page, new pages are added automatically
 
 ### Download
-- Once generated, a PDF preview appears in the browser
-- Click **Download PDF** to save the print-ready file
+- Once generated, click **Download PDF** to save the print-ready file.
 
 ---
 
-## ⚙️ API Endpoints
+## 🔐 Security Features
 
-| Method | Route      | Description                          |
-|--------|------------|--------------------------------------|
-| GET    | `/`        | Serves the frontend UI               |
-| POST   | `/process` | Accepts images, returns a PDF stream |
-
-### `/process` Form Data
-
-| Field       | Type    | Description                              |
-|-------------|---------|------------------------------------------|
-| `image_0`   | File    | First uploaded image                     |
-| `copies_0`  | Integer | Number of copies for image 0             |
-| `image_1`   | File    | Second uploaded image (if any)           |
-| `copies_1`  | Integer | Number of copies for image 1             |
-| `width`     | Integer | Passport photo width in px (default 400) |
-| `height`    | Integer | Passport photo height in px (default 400)|
-| `spacing`   | Integer | Row spacing in px (default 25)           |
-| `border`    | Integer | Border size in px (default 2)            |
-
----
-
-## 🔐 Environment Variables Reference
-
-| Variable                | Description                          |
-|-------------------------|--------------------------------------|
-| `REMOVE_BG_API_KEY`     | API key from remove.bg               |
-| `CLOUDINARY_CLOUD_NAME` | Your Cloudinary cloud name           |
-| `CLOUDINARY_API_KEY`    | Cloudinary API key                   |
-| `CLOUDINARY_API_SECRET` | Cloudinary API secret                |
-
----
-
-## 🐛 Known Limitations
-
-- remove.bg has a daily free-tier quota — heavy usage may return a `429` error
-- Very large images may slow down processing
-- The Cloudinary `gen_restore` transformation may not be available on all plans
+- The application uses `app.config['MAX_CONTENT_LENGTH']` to strictly limit user uploads (16 MB maximum) protecting against large payload Denial of Service attacks.
+- File metadata is vetted and names are sanitized via `secure_filename`.
+- Decompression bomb exploits are prevented by restricting `Image.MAX_IMAGE_PIXELS`.
+- Internal errors are masked to prevent server logic leaking to clients during exceptions.
 
 ---
 
